@@ -1,0 +1,32 @@
+[tool.poetry]
+name = "qa-pdfs"
+version = "0.1.0"
+description = "Q&A with several PDFs"
+authors = ["Fernando Robledo <fernando.robledoruiz@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.13"
+pypdf2 = "^3.0.1"
+langchain = "^0.1.13"
+streamlit = "^1.32.2"
+python-dotenv = "^1.0.1"
+voyageai = "^0.2.1"
+pinecone-client = "^3.2.2"
+pypdf = "^4.1.0"
+sentence-transformers = "^2.6.1"
+langchain-openai = "^0.1.1"
+langchain-pinecone = "^0.0.3"
+openai = "^1.16.2"
+amazon-textract-caller = "^0.2.3"
+amazon-textract-textractor = "^1.7.9"
+boto3 = "^1.34.80"
+langchain-community = "^0.0.32"
+
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.29.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
