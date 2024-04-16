@@ -75,30 +75,12 @@ def run_chat(index_name, namespace):
                     st.write(msg.content)
 
 
-def load_additional_documents(index_name: str, namespace: str):
-    genre = st.text_input("Genre:")
-    title = st.text_input("Title:")
-    code = st.text_input("Code:")
-    year = st.text_input("Year:")
-    metadata = {
-        "genre": genre,
-        "title": title,
-        "code": code,
-        "year": year
-    }
-    pdf_file = st.file_uploader("Pdf file:")
-    if st.button('Prepare data'):
-        prepare_data(pdf_file=pdf_file,
-                     index_name=index_name,
-                     namespace=namespace,
-                     metadata=metadata)
-
-
-def load_bucket_with_file(pdf_file, bucket_name):
+def load_bucket_with_file(pdf_file, bucket_name, file_name):
     if st.button('Load file'):
         with st.spinner('Processing...'):
-            file_name = pdf_file.name
+
             if upload_fileobj_to_s3(file_obj=pdf_file, bucket_name=bucket_name, object_name=file_name):
-                st.success('Done')
+                return True
             else:
-                st.error('Upload fails')
+                print("Faile to upload file to S3")
+                return False

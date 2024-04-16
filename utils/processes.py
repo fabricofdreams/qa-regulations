@@ -14,6 +14,17 @@ from botocore.exceptions import NoCredentialsError
 from langchain_text_splitters import RecursiveCharacterTextSplitter, CharacterTextSplitter
 import requests
 
+"""Functions for main processes:
+    1- Get text from a PDF file
+    2- Split text into chunks/documents for embedding preparation
+    3- Embeding chunks using Anthropic, SentenceTransformer
+    4- Store vector into Pinecone index
+    5- Delete all vector from Pinecone Index
+    6- Get context from Pinecone Index
+    7- Get response to user query by augmenting it with text from Pinecone Index
+    8- Create iterable objet to upsert to Pinecone Index
+    
+    """
 
 load_dotenv()
 
@@ -61,6 +72,20 @@ def anthropic_emmbed_data(lst_of_chunks):
     result = vo.embed(lst_of_chunks, model="voyage-large-2",
                       input_type=None)
     return result.embeddings
+
+
+def sentence_transformer_embed_data(lst_of_chunks):
+    """
+    Embed chunks of text using SentenceTransformer model.
+    Sentences are passed as a list of string.
+
+    Args:
+        lst_of_chunks (list): List of chunks of text.
+    Returns:
+        vector (float): List of values from 0 to 1.
+    """
+    model = SentenceTransformer('all-MiniLM-L6-v2')
+    return model.encode(lst_of_chunks)
 
 
 def pinecone_store_data(vectors, index_name, namespace, dimensions=384):
@@ -174,20 +199,6 @@ def get_response(query, index_name, namespace):
         ]
     )
     return res.choices[0].message.content
-
-
-def sentence_transformer_embed_data(lst_of_chunks):
-    """
-    Embed chunks of text using SentenceTransformer model.
-    Sentences are passed as a list of string.
-
-    Args:
-        lst_of_chunks (list): List of chunks of text.
-    Returns:
-        vector (float): List of values from 0 to 1.
-    """
-    model = SentenceTransformer('all-MiniLM-L6-v2')
-    return model.encode(lst_of_chunks)
 
 
 def create_records_to_upsert(lst_of_chunks, embeddings, metadata):

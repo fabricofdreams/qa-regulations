@@ -1,0 +1,56 @@
+{
+"genre_dict" : {
+    "Constitución":"100",
+    "Ley":"101",
+    "Decreto":"102",
+    "Decreto Ley":"103",
+    "Código":"104",
+    "Ordenanza":"105",
+    "Acuerdo Municipal":"106",
+    "Acuerdo-Pacto-Tratado":"107",
+    "Resolución":"108",
+    "Circular":"109",
+    "Estatutos":"200",
+    "Reglamentos":"201",
+    "Manuales": "202",
+    "Norma":"300"
+},
+
+"theme_dict" :{
+    "Constitución":"101",
+    "Generales":"102",
+    "Participación Comunitaria y patrimonio cultural":"103",
+    "Patrimonio natural y monumentos nacionales":"104",
+    "Flora silvestre y Bosques":"105",
+    "Recurso Atmosférico":"106",
+    "Fauna silvestre y caza":"107",
+    "Recurso Hídrico": "108",
+    "Residuos Sólidos": "109",
+    "Recurso Suelo": "110",
+    "Administración de riesgos y prevención de desastres": "111",
+    "Mares y costas": "112",
+    "Legislación internacional adoptada": "113"
+},
+
+"status_dict" :{
+        "Activa":"1",
+        "Derogada totalmente":"2",
+        "Derogada parcialmente":"3",
+        "Derogada temporalmente":"4"
+},
+
+"months":{
+    "Enero": 1,
+    "Febrero": 2,
+    "Marzo": 3,
+    "Abril":4,
+    "Mayo":5,
+    "Junio":6,
+    "Julio":7,
+    "Agosto":8,
+    "Septiembre":9,
+    "Octubre":10,
+    "Noviembre":11,
+    "Diciembre":12
+}
+}
