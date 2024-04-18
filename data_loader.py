@@ -1,8 +1,17 @@
 import streamlit as st
 import datetime
+import boto3
+import json
+from utils.processes import create_vector_for_pinecone, pinecone_store_data
+
+"""
+    1- Collect and ensamble metadata and return file name
+    2- Store metadata in DynamoDB
+    3- Upsert embeddings
+"""
 
 
-def get_metadata(genres_dict, status_dict, themes_dict,  months_dict):
+def assemble_metadata_and_return_filename(genres_dict, status_dict, themes_dict,  months_dict):
     genres_list = [key for key in genres_dict]
     themes_list = [key for key in themes_dict]
     status_list = [key for key in status_dict]
@@ -11,7 +20,6 @@ def get_metadata(genres_dict, status_dict, themes_dict,  months_dict):
     years_list = list(range(1900, current_year + 1))
     days_list = list(range(1, 32))
 
-    st.subheader("Add metadata")
     title = st.text_input(
         "Title:", help="Write a brief title for the regulation.")
     col11, col12 = st.columns(2)
@@ -58,6 +66,48 @@ def get_metadata(genres_dict, status_dict, themes_dict,  months_dict):
     if empty_keys:
         st.warning(f"Keys with empty values: {counter}")
     else:
-        st.success("Ready: Not empty values")
         file_name = f"{genres_dict[genre]}#{year}#{code}#{themes_dict[theme]}#{status_dict[status]}.pdf"
-        return file_name
+        return [file_name, metadata]
+
+
+def store_metadata_in_dynamodb(table_name, region, bucket_name, file_name, metadata, genres_dict, status_dict, themes_dict):
+    """Store metadata in DynamoDB database at a specific table, region
+
+    Args:
+        table_name (str): Name of database table.
+        region (str): Geographical region where the database is at.
+        bucket_name (str): S3 bucket name.
+        file_name (str): PDF file name.
+        metadata (Dict): Collection of data regarding the pdf file.
+    Return: True if HTTPStatusCode equal to 200
+    """
+    metadata['url'] = f"https://{bucket_name}.s3.{region}.amazonaws.com/{file_name}"
+
+    hierarchy_code = genres_dict[metadata['genre']]  # partition key
+    theme = themes_dict[metadata['theme']]
+    status = status_dict[metadata['status']]
+
+    sort_by = f"{metadata['code']}#{theme}#{status}"
+
+    metadata = json.dumps(metadata)
+
+    dynamodb = boto3.client('dynamodb', region)
+
+    item = {
+        "hierarchy_code": {'S': str(hierarchy_code)},
+        "sort_by": {'S': sort_by},
+        "metadata": {'S': metadata}
+    }
+
+    response = dynamodb.put_item(
+        TableName=table_name,
+        Item=item
+    )
+    message = response['ResponseMetadata']['HTTPStatusCode']
+    return message
+
+
+def upsert_embeddings_to_pinecone(index_name, namespace, dimensions, pdf_file, metadata):
+    vector = create_vector_for_pinecone(pdf_file=pdf_file, metadata=metadata)
+    pinecone_store_data(vector, index_name, namespace, dimensions)
+    return True

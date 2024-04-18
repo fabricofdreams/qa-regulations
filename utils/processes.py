@@ -22,8 +22,8 @@ import requests
     5- Delete all vector from Pinecone Index
     6- Get context from Pinecone Index
     7- Get response to user query by augmenting it with text from Pinecone Index
-    8- Create iterable objet to upsert to Pinecone Index
-    
+    8- Create iterable object to upsert to Pinecone Index
+    9- Prepare data to upsert
     """
 
 load_dotenv()
@@ -88,7 +88,7 @@ def sentence_transformer_embed_data(lst_of_chunks):
     return model.encode(lst_of_chunks)
 
 
-def pinecone_store_data(vectors, index_name, namespace, dimensions=384):
+def pinecone_store_data(vectors, index_name, namespace, dimensions=1536):
     """
     Store vectors into Pinecone index.
     """
@@ -179,6 +179,8 @@ def get_response(query, index_name, namespace):
     provided by the user above each question. If the information can not be found
     in the information provided by the user you truthfully say "I don't know. Check if the
     database us uptodated.".
+    
+    YOU MUST translate de answer to Spanish.
 
     Please provide the following information:
 
@@ -319,7 +321,7 @@ def upload_fileobj_to_s3(file_obj, bucket_name, object_name=None):
 
     Args:
         file_obj (file-like object): File-like object to upload
-        bucket_name (str): Bucket to upload to
+        bucket_name (str): Bucket to upload file to
         object_name (str): S3 object name. If not specified, a name must be provided
     Returns: True if file was uploaded, else False
     """
@@ -418,3 +420,22 @@ def upsert_files_pinecone(index_name, namespace, pdf, metadata, dimensions):
         documents=docs, embeddings=embeddings, metadata=metadata)
     pinecone_store_data(vectors=vector, index_name=index_name,
                         namespace=namespace, dimensions=dimensions)
+
+
+def create_vector_for_pinecone(pdf_file, metadata):
+    """
+    Prepare data for Pinecone index.
+    """
+    # get text from PDF
+    docs = get_text_from_pdf(pdf_file)
+    print("Total length of document: ", len(docs))
+    # split text into chunks
+    lst_of_chunks = split_text_into_chunks(docs)
+    print("Total of chunks: ", len(lst_of_chunks),
+          "| Type: ", type(lst_of_chunks))
+    # embed chunks of text
+    embeddings = openai_embed_data(lst_of_chunks)
+    print("Total embeddings: ", len(embeddings), " | Type: ", type(embeddings))
+    # create records
+    vector = create_records_to_upsert(lst_of_chunks, embeddings, metadata)
+    return vector

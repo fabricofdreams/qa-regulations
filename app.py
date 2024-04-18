@@ -11,7 +11,7 @@ st.sidebar.title('Settings')
 
 
 with st.sidebar:
-    index_name = st.text_input("Index name:", value="tester-01")
+    index_name = st.text_input("Index name:", value="col-ambiente")
     namespace = st.text_input("namespace:", value="regulations")
 
 

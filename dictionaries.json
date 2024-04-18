@@ -52,5 +52,10 @@
     "Octubre":10,
     "Noviembre":11,
     "Diciembre":12
+},
+"index_name":{
+    "col-ambiente":1,
+    "tester-01":2
 }
+
 }
